@@ -8,6 +8,10 @@ source "http://rubygems.org"
 group :development do
   gem "rspec", "~> 2.3.0"
   gem "yard", "~> 0.6.0"
+  # kramdown provides pure-ruby markdown for yard.
+  gem "kramdown", "~> 0.13"
+  # Code coverage the way I like.
+  gem 'simplecov', '>= 0.4.0'
   gem "bundler", "~> 1.0.0"
   gem "jeweler", "~> 1.5.2"
 end

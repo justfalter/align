@@ -1,5 +1,11 @@
 # align
-align provides implementations of global and local alignment algorithms. This library was created as it seemed that the Ruby landscape seemed to lack implementations of the (Needleman-Wunsch)[http://en.wikipedia.org/wiki/Needleman%E2%80%93Wunsch_algorithm] and (Smith–Waterman)[http://en.wikipedia.org/wiki/Smith-Waterman_algorithm] algorithms. These algorithms are most often associated with the field of (Bioinformatics)[http://en.wikipedia.org/wiki/Bioinformatics], providing efficient mechanisms for aligning protein and nucleotide sequences.
+align provides implementations of global and local alignment algorithms. 
+This library was created as it seemed that the Ruby landscape seemed to lack 
+implementations of the [Needleman-Wunsch](http://en.wikipedia.org/wiki/Needleman%E2%80%93Wunsch_algorithm) 
+and [Smith–Waterman](http://en.wikipedia.org/wiki/Smith-Waterman_algorithm) 
+algorithms. These algorithms are most often associated with the field of 
+[Bioinformatics](http://en.wikipedia.org/wiki/Bioinformatics), and allow for 
+an efficient mechanisms for aligning protein and nucleotide sequences.
 
 ## Contributing to align
  
@@ -13,6 +19,5 @@ align provides implementations of global and local alignment algorithms. This li
 
 ## Copyright
 
-Copyright (c) 2011 Michael Ryan. See LICENSE.txt for
-further details.
+Copyright (c) 2011 Michael Ryan. See LICENSE.txt for further details.
 

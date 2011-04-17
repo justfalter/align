@@ -48,4 +48,4 @@ ref/
 tmp/
 *.bundle
 *.gemspec
-
+coverage/

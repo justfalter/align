@@ -32,6 +32,12 @@ RSpec::Core::RakeTask.new(:spec) do |spec|
   spec.pattern = FileList['spec/**/*_spec.rb']
 end
 
+desc "Runs specs with coverage via Simplecov"
+task :coverage do
+  ENV['COVERAGE'] = "true"
+  Rake::Task[:spec].invoke
+end
+
 task :default => :spec
 
 require 'yard'
