@@ -11,6 +11,19 @@ describe Align::NeedlemanWunsch::AlignmentMatrix do
   context "for 'GATTCAGTTA' and 'GGATCGA'" do
 
     describe :align do
+      context "when aligning 'azzz' and 'zzz'" do
+        before :each do
+          @align1, @align2 = Align::NeedlemanWunsch.align('azzz', 'zzz', :skip_obj => '-')
+        end
+        
+        it "should align 1 as 'azzz'" do
+          @align1.join('').should == "azzz"
+        end
+        it "should align 2 as '-zzz'" do
+          @align2.join('').should == "-zzz"
+        end
+
+      end
       context "by default" do
         before :each do
           @align1, @align2 = Align::NeedlemanWunsch.align(@seq1, @seq2, :skip_obj => '-')

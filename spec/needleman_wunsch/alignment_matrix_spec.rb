@@ -112,6 +112,19 @@ describe Align::NeedlemanWunsch::AlignmentMatrix do
     its(:score) { should == 6}
     its(:gap_penalty) {should == 0}
 
+    describe "#[]" do
+      it "should raise an error when accessing an out of bound column" do
+        lambda do
+          @matrix[@matrix.cols+1,0]
+        end.should raise_error(ArgumentError, "out of bounds (col: 13 >= 12 || row: 0 >= 8)")
+      end
+      it "should raise an error when accessing an out of bound row" do
+        lambda do
+          @matrix[0,@matrix.rows+1]
+        end.should raise_error(ArgumentError, "out of bounds (col: 0 >= 12 || row: 9 >= 8)")
+      end
+    end
+
     it "should have the properly built matrix" do
       @matrix.to_a.should == 
         [
@@ -165,6 +178,20 @@ describe Align::NeedlemanWunsch::AlignmentMatrix do
         [1,1, :align]
       ]
     end
-
   end # "with two similar sequences"
+
+  describe "#traceback" do
+    it "should raise an exception if the select_alignment_proc returns something other than :align, :shift1, or :shift2" do
+      select_proc = lambda do |score|
+        :foo
+      end
+
+      lambda do
+        matrix = Align::NeedlemanWunsch::AlignmentMatrix.new(@seq1, @seq2, 
+                                          :select_alignment_proc => select_proc)
+        matrix.traceback
+      end.should raise_error(StandardError, "invalid return from select_alignment_proc: :foo")
+    end
+
+  end
 end

@@ -73,20 +73,9 @@ module Align
       # @return [Object]
       def [](col, row)
         if col >= @cols || row >= @rows
-          raise "out of bounds (col: #{col} >= #{@cols} || row: #{row} >= #{@rows}"
+          raise ArgumentError.new("out of bounds (col: #{col} >= #{@cols} || row: #{row} >= #{@rows})")
         end
         @matrix[col][row]
-      end
-
-      # Set the col,row to v
-      # @param [Fixnum] col
-      # @param [Fixnum] row
-      # @param [Object] v
-      def []=(col, row, v)
-        if col >= @cols || row >= @rows
-          raise "out of bounds (col: #{col} >= #{@cols} || row: #{row} >= #{@rows}"
-        end
-        @matrix[col][row] = v
       end
 
       # Fills the matrix with the alignment map.
@@ -130,7 +119,7 @@ module Align
           when :shift1;   j -= 1
           when :align; i -= 1; j -= 1
           else
-            raise "invalid return from select_align_proc"
+            raise "invalid return from select_alignment_proc: #{last_move.inspect}"
           end
         end # while
 
