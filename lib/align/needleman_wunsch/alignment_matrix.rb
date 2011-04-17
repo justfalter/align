@@ -40,6 +40,7 @@ module Align
       end
 
       # Returns the score matrix
+      # @return [Array<Array<Fixnum>>] A matrix where each cell is the score.
       def to_score_matrix
         @matrix.map do |col|
           col.map do |row_item|
@@ -48,7 +49,9 @@ module Align
         end
       end
 
-      # Returns the score matrix
+      # Returns the traceback matrix
+      # @return [Array<Array<Fixnum>>] A matrix where each cell contains the
+      #  traceback flags.
       def to_traceback_matrix
         @matrix.map do |col|
           col.map do |row_item|
@@ -80,6 +83,7 @@ module Align
           end
         end
       end # fill
+      private :fill
 
       # @return [Fixnum] The global alignment score.
       def score
@@ -92,10 +96,7 @@ module Align
       #  Matrix. Note that for use in constructing the alignment of the provided
       #  sequences, you will want to substract 1 from each value. This is because
       #  the matrix is offset by 1 to account for the alignment penalty.
-      def traceback
-        i = @cols - 1
-        j = @rows - 1
-
+      def traceback(i = @cols - 1, j = @rows - 1)
         trace = []
 
         last_move = CELL_FLAG_ALIGN
