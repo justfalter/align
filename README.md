@@ -7,6 +7,11 @@ algorithms. These algorithms are most often associated with the field of
 [Bioinformatics](http://en.wikipedia.org/wiki/Bioinformatics), and allow for 
 an efficient mechanisms for aligning protein and nucleotide sequences.
 
+The goal of this library is to provide implementations of algorithms
+in a way that they might be used to align anything from simple strings to 
+complicated objects. As time goes on, I'll be sure to make an effort to provide
+examples of how this may be done.
+
 ## Contributing to align
  
 * Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet
