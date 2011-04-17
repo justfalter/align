@@ -3,6 +3,7 @@ require 'align/needleman_wunsch'
 require 'pp'
 
 describe Align::NeedlemanWunsch::AlignmentMatrix do
+  include Align::NeedlemanWunsch::Constants
   before :each do
     @seq1 = "GAATTCAGTTA"
     @seq2 = "GGATCGA"
@@ -46,12 +47,12 @@ describe Align::NeedlemanWunsch::AlignmentMatrix do
       context "by changing the select_alignment_proc to favor shift2, shift1, align" do
         before :each do
           select_align_proc = lambda do |score|
-            if score.shift2?
-              :shift2
-            elsif score.shift1?
-              :shift1
+            if (score & CELL_FLAG_SHIFT2) != 0
+              CELL_FLAG_SHIFT2
+            elsif (score & CELL_FLAG_SHIFT1) != 0
+              CELL_FLAG_SHIFT1
             else
-              :align
+              CELL_FLAG_ALIGN
             end
           end
 
@@ -71,12 +72,12 @@ describe Align::NeedlemanWunsch::AlignmentMatrix do
       context "by changing the select_alignment_proc to favor shift2, align, shift1" do
         before :each do
           select_align_proc = lambda do |score|
-            if score.shift2?
-              :shift2
-            elsif score.align?
-              :align
+            if (score & CELL_FLAG_SHIFT2) != 0
+              CELL_FLAG_SHIFT2
+            elsif (score & CELL_FLAG_ALIGN) != 0
+              CELL_FLAG_ALIGN
             else
-              :shift1
+              CELL_FLAG_SHIFT1
             end
           end
 
@@ -96,12 +97,12 @@ describe Align::NeedlemanWunsch::AlignmentMatrix do
       context "by changing the select_alignment_proc to foo" do
         before :each do
           select_align_proc = lambda do |score|
-            if score.shift2?
-              :shift2
-            elsif score.align?
-              :align
+            if (score & CELL_FLAG_SHIFT2) != 0
+              CELL_FLAG_SHIFT2
+            elsif (score & CELL_FLAG_ALIGN) != 0
+              CELL_FLAG_ALIGN
             else
-              :shift1
+              CELL_FLAG_SHIFT1
             end
           end
           score_proc = lambda do |a,b|

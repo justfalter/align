@@ -7,49 +7,10 @@ require 'pp'
 
 describe Align::NeedlemanWunsch::AlignmentMatrix do
   include Align::NeedlemanWunsch
+  include Align::NeedlemanWunsch::Constants
   before :each do
     @seq1 = "GAATTCAGTTA"
     @seq2 = "GGATCGA"
-  end
-
-  describe :default_score_proc do
-    it "should return 1 if two things are equal" do
-      AlignmentMatrix.default_score_proc("a", "a").should == 1
-    end
-
-    it "should return 0 if two things are not equal" do
-      AlignmentMatrix.default_score_proc("a", "b").should == 0
-    end
-  end # :default_score_proc
-
-  describe :default_select_slignment_proc do
-    it "should return :align all are equal" do
-      AlignmentMatrix.default_select_alignment_proc(AlignmentScore.new(1,1,1)).should == :align
-    end
-
-    it "should return :align if shift2/align are the max" do
-      AlignmentMatrix.default_select_alignment_proc(AlignmentScore.new(1,1,0)).should == :align
-    end
-
-    it "should return :shift2 if shift2/shift1 are the max" do
-      AlignmentMatrix.default_select_alignment_proc(AlignmentScore.new(1,0,1)).should == :shift2
-    end
-
-    it "should return :shift2 if shift2 is the max" do
-      AlignmentMatrix.default_select_alignment_proc(AlignmentScore.new(1,0,0)).should == :shift2
-    end
-    
-    it "should return :align if align/shift1 are the max" do
-      AlignmentMatrix.default_select_alignment_proc(AlignmentScore.new(0,1,1)).should == :align
-    end
-
-    it "should return :align if align is the max" do
-      AlignmentMatrix.default_select_alignment_proc(AlignmentScore.new(0,1,0)).should == :align
-    end
-    
-    it "should return :shift1 if shift1 is the max" do
-      AlignmentMatrix.default_select_alignment_proc(AlignmentScore.new(0,0,1)).should == :shift1
-    end
   end
 
 ## Commented out stuff that I use to help me assess performance.
@@ -77,6 +38,7 @@ describe Align::NeedlemanWunsch::AlignmentMatrix do
 #      x.report("10000   ") {10000.times {Align::NeedlemanWunsch::AlignmentMatrix.new(@seq1, @seq2).traceback}}
 #    end
 #  end
+  
   context "with two similar sequences" do
     before :each do
       @matrix = Align::NeedlemanWunsch::AlignmentMatrix.new(@seq1, @seq2)
@@ -125,8 +87,8 @@ describe Align::NeedlemanWunsch::AlignmentMatrix do
       end
     end
 
-    it "should have the properly built matrix" do
-      @matrix.to_a.should == 
+    it "should have a properly built score matrix" do
+      @matrix.to_score_matrix.should == 
         [
         [0,0,0,0,0,0,0,0],
         [0,1,1,1,1,1,1,1],
@@ -142,20 +104,38 @@ describe Align::NeedlemanWunsch::AlignmentMatrix do
         [0,1,2,3,3,4,5,6],
       ]
     end
+
+    it "should have a properly built traceback matrix" do
+      @matrix.to_traceback_matrix.should == 
+        [
+        [7,7,7,7,7,7,7,7],
+        [7,1,3,2,2,2,3,2],
+        [7,4,7,1,2,2,2,3],
+        [7,4,7,5,7,7,7,1],
+        [7,4,7,4,1,2,2,6],
+        [7,4,7,4,5,7,7,7],
+        [7,4,7,4,4,1,2,2],
+        [7,4,7,5,4,4,7,1],
+        [7,5,1,6,4,4,1,6],
+        [7,4,4,7,5,4,4,7],
+        [7,4,4,7,5,4,4,7],
+        [7,4,4,1,6,4,4,1],
+      ]
+    end
     
     it "should be possible to return the proper traceback" do
       @matrix.traceback.should == [
-        [11,7, :align],
-        [10,6, :align],
-        [9,6, :shift2],
-        [8,6, :shift2],
-        [7,5, :align],
-        [6,5, :shift2],
-        [5,4, :align],
-        [4,3, :align],
-        [3,3, :shift2],
-        [2,2, :align],
-        [1,1, :align]
+        [11,7, CELL_FLAG_ALIGN],
+        [10,6, CELL_FLAG_ALIGN],
+        [9,6, CELL_FLAG_SHIFT2],
+        [8,6, CELL_FLAG_SHIFT2],
+        [7,5, CELL_FLAG_ALIGN],
+        [6,5, CELL_FLAG_SHIFT2],
+        [5,4, CELL_FLAG_ALIGN],
+        [4,3, CELL_FLAG_ALIGN],
+        [3,3, CELL_FLAG_SHIFT2],
+        [2,2, CELL_FLAG_ALIGN],
+        [1,1, CELL_FLAG_ALIGN]
       ]
     end
 
@@ -165,23 +145,23 @@ describe Align::NeedlemanWunsch::AlignmentMatrix do
         traceback << [i,j, last_move]
       end
       traceback.should == [
-        [11,7, :align],
-        [10,6, :align],
-        [9,6, :shift2],
-        [8,6, :shift2],
-        [7,5, :align],
-        [6,5, :shift2],
-        [5,4, :align],
-        [4,3, :align],
-        [3,3, :shift2],
-        [2,2, :align],
-        [1,1, :align]
+        [11,7, CELL_FLAG_ALIGN],
+        [10,6, CELL_FLAG_ALIGN],
+        [9,6, CELL_FLAG_SHIFT2],
+        [8,6, CELL_FLAG_SHIFT2],
+        [7,5, CELL_FLAG_ALIGN],
+        [6,5, CELL_FLAG_SHIFT2],
+        [5,4, CELL_FLAG_ALIGN],
+        [4,3, CELL_FLAG_ALIGN],
+        [3,3, CELL_FLAG_SHIFT2],
+        [2,2, CELL_FLAG_ALIGN],
+        [1,1, CELL_FLAG_ALIGN]
       ]
     end
   end # "with two similar sequences"
 
   describe "#traceback" do
-    it "should raise an exception if the select_alignment_proc returns something other than :align, :shift1, or :shift2" do
+    it "should raise an exception if the select_alignment_proc returns something other than CELL_FLAG_ALIGN, CELL_FLAG_SHIFT1, or CELL_FLAG_SHIFT2" do
       select_proc = lambda do |score|
         :foo
       end
