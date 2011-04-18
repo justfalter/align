@@ -1,4 +1,4 @@
-require 'align/needleman_wunsch/alignment_matrix'
+require 'align/alignment_matrix'
 
 module Align
   # References:
@@ -11,7 +11,7 @@ module Align
     #  when it is found that we must skip.
     def self.align(seq1, seq2, opts = {})
       skip_obj = opts[:skip_obj] || nil
-      matrix = AlignmentMatrix.new(seq1, seq2, opts)
+      matrix = Align::AlignmentMatrix.new(seq1, seq2, opts)
 
       alignment_1 = []
       alignment_2 = []

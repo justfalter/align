@@ -1,11 +1,11 @@
-require_relative '../spec_helper'
-require 'align/needleman_wunsch/alignment_matrix_helpers'
+require_relative 'spec_helper'
+require 'align/alignment_matrix_helpers'
 require 'benchmark'
 
 
-describe Align::NeedlemanWunsch::AlignmentMatrixHelpers do
-  include Align::NeedlemanWunsch::Constants
-  include Align::NeedlemanWunsch::AlignmentMatrixHelpers
+describe Align::AlignmentMatrixHelpers do
+  include Align::Constants
+  include Align::AlignmentMatrixHelpers
 
   describe :create_cell do
     it "should pick the max as the value" do

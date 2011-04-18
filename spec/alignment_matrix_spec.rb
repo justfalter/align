@@ -1,13 +1,12 @@
-require_relative '../spec_helper'
-require 'align/needleman_wunsch/alignment_matrix'
+require_relative 'spec_helper'
+require 'align/alignment_matrix'
 require 'benchmark'
 
 require 'matrix'
 require 'pp'
 
-describe Align::NeedlemanWunsch::AlignmentMatrix do
-  include Align::NeedlemanWunsch
-  include Align::NeedlemanWunsch::Constants
+describe Align::AlignmentMatrix do
+  include Align::Constants
   before :each do
     @seq1 = "GAATTCAGTTA"
     @seq2 = "GGATCGA"
@@ -16,14 +15,14 @@ describe Align::NeedlemanWunsch::AlignmentMatrix do
 ## Commented out stuff that I use to help me assess performance.
 #  it "should bench" do
 #    Benchmark.bm do |x|
-#      x.report("100     ") {100.times {Align::NeedlemanWunsch::AlignmentMatrix.new(@seq1, @seq2)}}
-#      x.report("1000    ") {1000.times {Align::NeedlemanWunsch::AlignmentMatrix.new(@seq1, @seq2)}}
-#      x.report("10000   ") {10000.times {Align::NeedlemanWunsch::AlignmentMatrix.new(@seq1, @seq2)}}
+#      x.report("100     ") {100.times {Align::AlignmentMatrix.new(@seq1, @seq2)}}
+#      x.report("1000    ") {1000.times {Align::AlignmentMatrix.new(@seq1, @seq2)}}
+#      x.report("10000   ") {10000.times {Align::AlignmentMatrix.new(@seq1, @seq2)}}
 #    end
 #  end
 #
 #  it "should bench" do
-#    matrix = Align::NeedlemanWunsch::AlignmentMatrix.new(@seq1, @seq2)
+#    matrix = Align::AlignmentMatrix.new(@seq1, @seq2)
 #    Benchmark.bm do |x|
 #      x.report("100     ") {100.times {matrix.traceback}}
 #      x.report("1000    ") {1000.times {matrix.traceback}}
@@ -33,15 +32,15 @@ describe Align::NeedlemanWunsch::AlignmentMatrix do
 #
 #  it "should bench" do
 #    Benchmark.bm do |x|
-#      x.report("100     ") {100.times {Align::NeedlemanWunsch::AlignmentMatrix.new(@seq1, @seq2).traceback}}
-#      x.report("1000    ") {1000.times {Align::NeedlemanWunsch::AlignmentMatrix.new(@seq1, @seq2).traceback}}
-#      x.report("10000   ") {10000.times {Align::NeedlemanWunsch::AlignmentMatrix.new(@seq1, @seq2).traceback}}
+#      x.report("100     ") {100.times {Align::AlignmentMatrix.new(@seq1, @seq2).traceback}}
+#      x.report("1000    ") {1000.times {Align::AlignmentMatrix.new(@seq1, @seq2).traceback}}
+#      x.report("10000   ") {10000.times {Align::AlignmentMatrix.new(@seq1, @seq2).traceback}}
 #    end
 #  end
   
   context "with two similar sequences" do
     before :each do
-      @matrix = Align::NeedlemanWunsch::AlignmentMatrix.new(@seq1, @seq2)
+      @matrix = Align::AlignmentMatrix.new(@seq1, @seq2)
     end
 
     # Actual matrix
@@ -167,7 +166,7 @@ describe Align::NeedlemanWunsch::AlignmentMatrix do
       end
 
       lambda do
-        matrix = Align::NeedlemanWunsch::AlignmentMatrix.new(@seq1, @seq2, 
+        matrix = Align::AlignmentMatrix.new(@seq1, @seq2, 
                                           :select_alignment_proc => select_proc)
         matrix.traceback
       end.should raise_error(StandardError, "invalid return from select_alignment_proc: :foo")

@@ -2,8 +2,8 @@ require_relative '../spec_helper'
 require 'align/needleman_wunsch'
 require 'pp'
 
-describe Align::NeedlemanWunsch::AlignmentMatrix do
-  include Align::NeedlemanWunsch::Constants
+describe Align::NeedlemanWunsch do
+  include Align::Constants
   before :each do
     @seq1 = "GAATTCAGTTA"
     @seq2 = "GGATCGA"
