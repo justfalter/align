@@ -88,8 +88,6 @@ module Align
     end # fill
 
     # Traces backward, finding the alignment.
-    # @param [Integer] i The column to start tracing back from
-    # @param [Integer] j The row to start tracing back from
     # @yield [i,j,step] 
     # @yieldparam i [Integer] The location in sequence one
     # @yieldparam j [Integer] The location in sequence two
@@ -149,8 +147,6 @@ module Align
 
     # Returns the sequences in aligned arrays. Gaps are filled with :skip_obj
     # @return Two arrays containing the sequences, and their elements.
-    # @param [Integer] i The column to start tracing back from
-    # @param [Integer] j The row to start tracing back from
     def align
       alignment_1 = []
       alignment_2 = []

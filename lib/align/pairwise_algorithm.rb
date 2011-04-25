@@ -14,5 +14,12 @@ module Align
     def max3(v1,v2,v3)
       (v1 >= v2) ? ((v1 >= v3)? v1 : v3) : ((v2 >= v3)? v2 : v3)
     end
+
+
+    # Returns the sequences in aligned arrays. Gaps are filled with :skip_obj
+    # @return Two arrays containing the sequences, and their elements.
+    def align
+      raise NotImplementedError.new("#{self.class}#align")
+    end
   end
 end
