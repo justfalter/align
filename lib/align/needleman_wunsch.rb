@@ -1,34 +1,16 @@
-require 'align/scoring_interface'
+require 'align/basic_scoring'
 require 'align/pairwise_algorithm'
 
 module Align
-  # Default scoring for the Needleman-Wunsch algorithm.
-  class NeedlemanWunschScoring < ScoringInterface
-    MATCH = 1
-    NOMATCH = 0
-    GAP_PENALTY = 0
-
-    def score_align(a,b)
-      (a == b) ? MATCH : NOMATCH
-    end
-
-    def score_insert(a)
-      GAP_PENALTY
-    end
-
-    def score_delete(a)
-      GAP_PENALTY
-    end
-  end
-
   # Align two sequences via [NeedlemanWunsch.align]
   # References:
   # [http://www.avatar.se/molbioinfo2001/dynprog/dynamic.html]
   class NeedlemanWunsch < PairwiseAlgorithm
-    attr_reader :highest_score, :highest_score_loc
     attr_reader :cols, :rows, :matrix
 
-    DEFAULT_SCORING = NeedlemanWunschScoring.new
+    # Default scoring for 
+    SCORING_DEFAULT = Align::BasicScoring.new(1,0,0)
+    SCORING_ALT1    = Align::BasicScoring.new(1,-1,-1)
 
     # @param [#[], #size] seq1 The first sequence
     # @param [#[], #size] seq2 The second sequence
@@ -37,7 +19,7 @@ module Align
     # @option opts [Object] :skip_obj (nil) An object to shove into the gaps of
     #  the aligned sequences
     def initialize(seq1, seq2, opts = {})
-      super(seq1, seq2, opts[:scoring] || DEFAULT_SCORING)
+      super(seq1, seq2, opts[:scoring] || SCORING_DEFAULT)
 
       @highest_score = nil
       @highest_score_loc = nil
@@ -54,12 +36,17 @@ module Align
       fill()
     end
 
+    def score
+      @matrix[@rows-1][@cols-1]
+    end
+
     # Fills the matrix with the alignment map.
     def fill
+      @matrix[0][0] = 0
       # Set up the first column on each row.
-      0.upto(@rows-1) {|i| @matrix[i][0] = 0}
+      1.upto(@rows-1) {|i| @matrix[i][0] = @matrix[i-1][0] + @scoring.score_delete(@seq1[i])}
       # Set up the first row 
-      @matrix[0].fill(0)
+      1.upto(@cols-1) {|j| @matrix[0][j] = @matrix[0][j-1] + @scoring.score_insert(@seq2[j])}
 
       1.upto(@rows-1) do |i|
         prv_row = @matrix[i-1]
@@ -76,12 +63,6 @@ module Align
           score_insert = cur_row[j-1] + @scoring.score_insert(seq2_obj)
           max = max3(score_align, score_delete, score_insert)
 
-          # Store the highest score and where we've seen it.
-          if @highest_score.nil? || max >= @highest_score
-            @highest_score = max
-            @highest_score_loc = [i,j]
-          end
-
           @matrix[i][j] = max
         end
       end
@@ -93,8 +74,8 @@ module Align
     # @yieldparam j [Integer] The location in sequence two
     # @yieldparam step [Integer] The direction we took
     def traceback
-      i = @highest_score_loc[0]
-      j = @highest_score_loc[1]
+      i = @rows - 1
+      j = @cols - 1
 
       while (i > 0 && j > 0)
         score = @matrix[i][j]
