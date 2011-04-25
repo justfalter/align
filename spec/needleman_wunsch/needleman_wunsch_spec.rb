@@ -107,20 +107,20 @@ describe Align::NeedlemanWunsch do
     # 7 A [0,1,2,3,3,3,4,5,5,5,5,X]
 
     subject {@matrix}
-    its(:cols) { should == @seq1.size + 1}
-    its(:rows) { should == @seq2.size + 1}
+    its(:rows) { should == @seq1.size + 1}
+    its(:cols) { should == @seq2.size + 1}
     its(:highest_score) { should == 6}
     its(:highest_score_loc) { should == [11,7] }
 
     describe "#[]" do
       it "should raise an error when accessing an out of bound column" do
         lambda do
-          @matrix[@matrix.cols+1,0]
+          @matrix[@matrix.rows+1,0]
         end.should raise_error(ArgumentError, "out of bounds (col: 13 >= 12 || row: 0 >= 8)")
       end
       it "should raise an error when accessing an out of bound row" do
         lambda do
-          @matrix[0,@matrix.rows+1]
+          @matrix[0,@matrix.cols+1]
         end.should raise_error(ArgumentError, "out of bounds (col: 0 >= 12 || row: 9 >= 8)")
       end
     end

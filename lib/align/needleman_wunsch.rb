@@ -26,7 +26,7 @@ module Align
   # [http://www.avatar.se/molbioinfo2001/dynprog/dynamic.html]
   class NeedlemanWunsch < PairwiseAlgorithm
     attr_reader :highest_score, :highest_score_loc
-    attr_reader :rows, :cols
+    attr_reader :cols, :rows
 
     DEFAULT_SCORING = NeedlemanWunschScoring.new
 
@@ -42,13 +42,13 @@ module Align
       @highest_score = nil
       @highest_score_loc = nil
 
-      @cols = @seq1.size + 1
-      @rows = @seq2.size + 1
+      @rows = @seq1.size + 1
+      @cols = @seq2.size + 1
 
       @skip_obj = opts[:skip_obj] || nil
 
-      @matrix = Array.new(@cols) do 
-        Array.new(@rows)
+      @matrix = Array.new(@rows) do 
+        Array.new(@cols)
       end
 
       fill()
@@ -64,30 +64,30 @@ module Align
     # @param [Fixnum] row
     # @return [Object]
     def [](col, row)
-      if col >= @cols || row >= @rows
-        raise ArgumentError.new("out of bounds (col: #{col} >= #{@cols} || row: #{row} >= #{@rows})")
+      if col >= @rows || row >= @cols
+        raise ArgumentError.new("out of bounds (col: #{col} >= #{@rows} || row: #{row} >= #{@cols})")
       end
       @matrix[col][row]
     end
 
     # Fills the matrix with the alignment map.
     def fill
-      0.upto(@cols-1) {|i| @matrix[i][0] = 0}
+      0.upto(@rows-1) {|i| @matrix[i][0] = 0}
       @matrix[0].fill(0)
 
-      1.upto(@cols-1) do |i|
-        prv_col = @matrix[i-1]
-        cur_col = @matrix[i]
+      1.upto(@rows-1) do |i|
+        prv_row = @matrix[i-1]
+        cur_row = @matrix[i]
 
-        1.upto(@rows-1) do |j|
+        1.upto(@cols-1) do |j|
           
           seq1_obj = @seq1[i-1]
           seq2_obj = @seq2[j-1]
 
           # Calculate the score.
-          score_align = prv_col[j-1] + @scoring.score_align(seq1_obj, seq2_obj)
-          score_delete = prv_col[j] + @scoring.score_delete(seq1_obj)
-          score_insert = cur_col[j-1] + @scoring.score_insert(seq2_obj)
+          score_align = prv_row[j-1] + @scoring.score_align(seq1_obj, seq2_obj)
+          score_delete = prv_row[j] + @scoring.score_delete(seq1_obj)
+          score_insert = cur_row[j-1] + @scoring.score_insert(seq2_obj)
           max = max3(score_align, score_delete, score_insert)
 
           # Store the highest score and where we've seen it.
