@@ -4,44 +4,38 @@ require 'benchmark'
 require 'pp'
 
 shared_examples_for "a needleman-wunsch alignment algorithm" do
-  before :each do
-    @seq1 = "GAATTCAGTTA"
-    @seq2 = "GGATCGA"
-  end
+  examples = [ 
+    ['bcefg', 'abcdef', '-bc-efg', 'abcdef-'],
+    ['GAATTCAGTTA', 'GGATCGA', 'GAATTCAGTTA', 'GGA-TC-G--A']
+  ]
 
-  context "for 'GATTCAGTTA' and 'GGATCGA'" do
-
-    context "when aligning 'azzz' and 'zzz'" do
+  examples.each do |seq1, seq2, exp1, exp2|
+    context "when aligning '#{seq1}' and '#{seq2}'" do
       before :each do
-        @align1, @align2 = @align_proc.call('azzz', 'zzz', :skip_obj => '-')
+        @align1, @align2 = @align_proc.call(seq1, seq2, :skip_obj => '-')
       end
       
-      it "should align 1 as 'azzz'" do
-        @align1.join('').should == "azzz"
+      it "should align 1 as '#{exp1}'" do
+        @align1.join('').should == exp1
       end
-      it "should align 2 as '-zzz'" do
-        @align2.join('').should == "-zzz"
+      it "should align 2 as '#{exp2}'" do
+        @align2.join('').should == exp2
       end
-
     end
-    context "by default" do
-      before :each do
-        @align1, @align2 = @align_proc.call(@seq1, @seq2, :skip_obj => '-')
-      end
 
-      it "should return arrays" do
-        @align1.should be_a(Array)
-        @align2.should be_a(Array)
+    context "when aligning '#{seq2}' and '#{seq1}'" do
+      before :each do
+        @align1, @align2 = @align_proc.call(seq2, seq1, :skip_obj => '-')
       end
       
-      it "should align 1 as 'GAATTCAGTTA'" do
-        @align1.join('').should == "GAATTCAGTTA"
+      it "should align 1 as '#{exp2}'" do
+        @align1.join('').should == exp2
       end
-      it "should align 2 as 'GGA-TC-G--A'" do
-        @align2.join('').should == "GGA-TC-G--A"
+      it "should align 2 as '#{exp1}'" do
+        @align2.join('').should == exp1
       end
+    end
 
-    end # by default
   end
 end
 
@@ -51,32 +45,6 @@ describe Align::NeedlemanWunsch do
     @seq2 = "GGATCGA"
   end
 
-## Commented out stuff that I use to help me assess performance.
-#  it "should bench" do
-#    Benchmark.bm do |x|
-#      x.report("100     ") {100.times {Align::NeedlemanWunsch.new(@seq1, @seq2)}}
-#      x.report("1000    ") {1000.times {Align::NeedlemanWunsch.new(@seq1, @seq2)}}
-#      x.report("10000   ") {10000.times {Align::NeedlemanWunsch.new(@seq1, @seq2)}}
-#    end
-#  end
-#
-#  it "should bench" do
-#    matrix = Align::NeedlemanWunsch.new(@seq1, @seq2)
-#    Benchmark.bm do |x|
-#      x.report("100     ") {100.times {matrix.traceback}}
-#      x.report("1000    ") {1000.times {matrix.traceback}}
-#      x.report("10000   ") {10000.times {matrix.traceback}}
-#    end
-#  end
-#
-#  it "should bench" do
-#    Benchmark.bm do |x|
-#      x.report("100     ") {100.times {Align::NeedlemanWunsch.new(@seq1, @seq2).traceback}}
-#      x.report("1000    ") {1000.times {Align::NeedlemanWunsch.new(@seq1, @seq2).traceback}}
-#      x.report("10000   ") {10000.times {Align::NeedlemanWunsch.new(@seq1, @seq2).traceback}}
-#    end
-#  end
-  
   context "with two similar sequences" do
     before :each do
       @matrix = Align::NeedlemanWunsch.new(@seq1, @seq2)
@@ -111,19 +79,6 @@ describe Align::NeedlemanWunsch do
     its(:cols) { should == @seq2.size + 1}
     its(:highest_score) { should == 6}
     its(:highest_score_loc) { should == [11,7] }
-
-    describe "#[]" do
-      it "should raise an error when accessing an out of bound column" do
-        lambda do
-          @matrix[@matrix.rows+1,0]
-        end.should raise_error(ArgumentError, "out of bounds (col: 13 >= 12 || row: 0 >= 8)")
-      end
-      it "should raise an error when accessing an out of bound row" do
-        lambda do
-          @matrix[0,@matrix.cols+1]
-        end.should raise_error(ArgumentError, "out of bounds (col: 0 >= 12 || row: 9 >= 8)")
-      end
-    end
 
     it "should have a properly built score matrix" do
       @matrix.to_score_matrix.should == 

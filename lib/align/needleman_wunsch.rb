@@ -59,17 +59,6 @@ module Align
       @matrix
     end
 
-    # Returns the value at col, row
-    # @param [Fixnum] col
-    # @param [Fixnum] row
-    # @return [Object]
-    def [](col, row)
-      if col >= @rows || row >= @cols
-        raise ArgumentError.new("out of bounds (col: #{col} >= #{@rows} || row: #{row} >= #{@cols})")
-      end
-      @matrix[col][row]
-    end
-
     # Fills the matrix with the alignment map.
     def fill
       0.upto(@rows-1) {|i| @matrix[i][0] = 0}
