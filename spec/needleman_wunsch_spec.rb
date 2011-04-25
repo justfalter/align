@@ -1,4 +1,4 @@
-require_relative '../spec_helper'
+require_relative 'spec_helper'
 require 'align/needleman_wunsch'
 require 'benchmark'
 require 'pp'
@@ -47,7 +47,7 @@ describe Align::NeedlemanWunsch do
 
   context "with two similar sequences" do
     before :each do
-      @matrix = Align::NeedlemanWunsch.new(@seq1, @seq2)
+      @nw = Align::NeedlemanWunsch.new(@seq1, @seq2)
     end
 
     # Actual matrix
@@ -74,14 +74,14 @@ describe Align::NeedlemanWunsch do
     # 6 G [0,1,2,2,3,3,4,4,X,X,X,5]
     # 7 A [0,1,2,3,3,3,4,5,5,5,5,X]
 
-    subject {@matrix}
+    subject {@nw}
     its(:rows) { should == @seq1.size + 1}
     its(:cols) { should == @seq2.size + 1}
     its(:highest_score) { should == 6}
     its(:highest_score_loc) { should == [11,7] }
 
     it "should have a properly built score matrix" do
-      @matrix.to_score_matrix.should == 
+      @nw.matrix.should == 
         [
         [0,0,0,0,0,0,0,0],
         [0,1,1,1,1,1,1,1],
@@ -99,7 +99,7 @@ describe Align::NeedlemanWunsch do
     end
 
     it "should be possible to return the proper traceback" do
-      @matrix.traceback_array.should == [
+      @nw.traceback_array.should == [
         [10,6, :align],
         [9,6, :delete],
         [8,6, :delete],
@@ -116,7 +116,7 @@ describe Align::NeedlemanWunsch do
 
     it "should be possible to construct the proper traceback via yield" do
       traceback = []
-      @matrix.traceback do |i,j, last_move|
+      @nw.traceback do |i,j, last_move|
         traceback << [i,j, last_move]
       end
       traceback.should == [

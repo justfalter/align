@@ -26,7 +26,7 @@ module Align
   # [http://www.avatar.se/molbioinfo2001/dynprog/dynamic.html]
   class NeedlemanWunsch < PairwiseAlgorithm
     attr_reader :highest_score, :highest_score_loc
-    attr_reader :cols, :rows
+    attr_reader :cols, :rows, :matrix
 
     DEFAULT_SCORING = NeedlemanWunschScoring.new
 
@@ -54,14 +54,11 @@ module Align
       fill()
     end
 
-    # Returns the score matrix # @return [Array<Array<Fixnum>>] A matrix where each cell is the score.
-    def to_score_matrix
-      @matrix
-    end
-
     # Fills the matrix with the alignment map.
     def fill
+      # Set up the first column on each row.
       0.upto(@rows-1) {|i| @matrix[i][0] = 0}
+      # Set up the first row 
       @matrix[0].fill(0)
 
       1.upto(@rows-1) do |i|
