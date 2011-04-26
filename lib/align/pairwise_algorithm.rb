@@ -9,11 +9,24 @@ module Align
       @scoring = scoring
     end
 
-    # Determines the maximum value of three variables. 3-4 times faster than
-    # [v1,v2,v3].max.
-    def max3(v1,v2,v3)
-      (v1 >= v2) ? ((v1 >= v3)? v1 : v3) : ((v2 >= v3)? v2 : v3)
+    # Max of 2
+    def max2(a,b)
+      a >= b ? a : b
     end
+
+    # Determines the maximum value of three variables. 3-4 times faster than
+    # [a,b,c].max.
+    def max3(a,b,c)
+      (a >= b) ? ((a >= c)? a : c) : ((b >= c)? b : c)
+    end
+
+    # Returns the max of 4 integers
+    def max4(a,b,c,d)
+      x = a >= b ? a : b
+      y = c >= d ? c : d
+      (x >= y) ? x : y
+    end
+
 
 
     # Returns the sequences in aligned arrays. Gaps are filled with :skip_obj

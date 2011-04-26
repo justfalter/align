@@ -1,7 +1,5 @@
 require_relative 'spec_helper'
 require 'align/needleman_wunsch'
-require 'benchmark'
-require 'pp'
 
 shared_examples_for "a needleman-wunsch alignment algorithm" do
   examples = [ 
@@ -76,7 +74,7 @@ shared_examples_for "a needleman-wunsch alignment algorithm" do
     its(:cols) { should == @seq2.size + 1}
 
     it "should use the score for the lower, right" do
-      @nw.score.should == @nw.matrix[@nw.rows-1][@nw.cols-1]
+      @nw.score.should == @score
     end
 
 #    it "should have a properly built score matrix" do
@@ -139,6 +137,7 @@ describe Align::NeedlemanWunsch do
   before :each do
     @klass = Align::NeedlemanWunsch
     @opts = {}
+    @score = 6
   end
   context "by default" do
     it_should_behave_like "a needleman-wunsch alignment algorithm" 
@@ -148,6 +147,7 @@ describe Align::NeedlemanWunsch do
     before :each do
       @klass = Align::NeedlemanWunsch
       @opts[:scoring] = Align::NeedlemanWunsch::SCORING_ALT1
+      @score = 1
     end
 
     it_should_behave_like "a needleman-wunsch alignment algorithm" 

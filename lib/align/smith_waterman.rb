@@ -2,24 +2,27 @@ require 'align/basic_scoring'
 require 'align/pairwise_algorithm'
 
 module Align
-  # Align two sequences via [NeedlemanWunsch.align]
+  # Align two sequences via [SmithWaterman.align]
   # References:
   # [http://www.avatar.se/molbioinfo2001/dynprog/dynamic.html]
-  class NeedlemanWunsch < PairwiseAlgorithm
-    attr_reader :cols, :rows, :matrix
+  class SmithWaterman < PairwiseAlgorithm
+    attr_reader :cols, :rows, :matrix, :max_score, :max_row, :max_col
 
     # Default scoring for 
-    SCORING_DEFAULT = Align::BasicScoring.new(1,0,0)
-    SCORING_ALT1    = Align::BasicScoring.new(1,-1,-1)
+    SCORING_DEFAULT = BasicScoring.new(2,-1,-3)
 
     # @param [#[], #size] seq1 The first sequence
     # @param [#[], #size] seq2 The second sequence
     # @param [Hash] opts Options
-    # @option opts [NeedlemanWunschScoring] :scoring (NeedlemanWunschScoring) An instance of a scoring object.
+    # @option opts [SmithWatermanScoring] :scoring (SmithWatermanScoring) An instance of a scoring object.
     # @option opts [Object] :skip_obj (nil) An object to shove into the gaps of
     #  the aligned sequences
     def initialize(seq1, seq2, opts = {})
       super(seq1, seq2, opts[:scoring] || SCORING_DEFAULT)
+
+      @max_score = nil
+      @max_row = nil
+      @max_col = nil
 
       @rows = @seq1.size + 1
       @cols = @seq2.size + 1
@@ -33,17 +36,13 @@ module Align
       fill()
     end
 
-    def score
-      @matrix[@rows-1][@cols-1]
-    end
-
     # Fills the matrix with the alignment map.
     def fill
       @matrix[0][0] = 0
       # Set up the first column on each row.
-      1.upto(@rows-1) {|i| @matrix[i][0] = @matrix[i-1][0] + @scoring.score_delete(@seq1[i])}
+      1.upto(@rows-1) {|i| @matrix[i][0] = 0}
       # Set up the first row 
-      1.upto(@cols-1) {|j| @matrix[0][j] = @matrix[0][j-1] + @scoring.score_insert(@seq2[j])}
+      1.upto(@cols-1) {|j| @matrix[0][j] = 0}
 
       1.upto(@rows-1) do |i|
         prv_row = @matrix[i-1]
@@ -58,7 +57,13 @@ module Align
           score_align = prv_row[j-1] + @scoring.score_align(seq1_obj, seq2_obj)
           score_delete = prv_row[j] + @scoring.score_delete(seq1_obj)
           score_insert = cur_row[j-1] + @scoring.score_insert(seq2_obj)
-          max = max3(score_align, score_delete, score_insert)
+          max = max4(score_align, score_delete, score_insert, 0)
+
+          if @max_score.nil? || max >= @max_score
+            @max_score = max
+            @max_row = i
+            @max_col = j
+          end
 
           @matrix[i][j] = max
         end
@@ -70,11 +75,9 @@ module Align
     # @yieldparam i [Integer] The location in sequence one
     # @yieldparam j [Integer] The location in sequence two
     # @yieldparam step [Integer] The direction we took
-    def traceback
-      i = @rows - 1
-      j = @cols - 1
+    def traceback(i = @max_row, j = @max_col)
 
-      while (i > 0 && j > 0)
+      while (i > 0 && j > 0) && @matrix[i][j] > 0
         score = @matrix[i][j]
 
         seq1_obj = @seq1[i-1]
@@ -102,15 +105,6 @@ module Align
         yield(i,j,flags) 
       end # while
 
-      while i > 0
-        i-=1
-        yield(i,j,:delete) 
-      end
-
-      while j > 0
-        j-=1
-        yield(i,j,:insert) 
-      end
     end # traceback
 
     # Like traceback, but returns an array of the traceback instead of 
