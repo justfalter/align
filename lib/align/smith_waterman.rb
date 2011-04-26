@@ -71,6 +71,8 @@ module Align
     end # fill
 
     # Traces backward, finding the alignment.
+    # @param [Integer] i The row to traceback from
+    # @param [Integer] j The column to traceback from
     # @yield [i,j,step] 
     # @yieldparam i [Integer] The location in sequence one
     # @yieldparam j [Integer] The location in sequence two
@@ -109,9 +111,11 @@ module Align
 
     # Like traceback, but returns an array of the traceback instead of 
     # yielding blocks.
-    def traceback_array
+    # @param [Integer] r The row to traceback from
+    # @param [Integer] c The column to traceback from
+    def traceback_array(r = @max_row, c = @max_col)
       trace = []
-      traceback do |i,j,flags|
+      traceback(r,c) do |i,j,flags|
         trace << [i,j,flags]
       end
       trace
@@ -119,11 +123,13 @@ module Align
 
     # Returns the sequences in aligned arrays. Gaps are filled with :skip_obj
     # @return Two arrays containing the sequences, and their elements.
-    def align
+    # @param [Integer] r The row to traceback from
+    # @param [Integer] c The column to traceback from
+    def align(r = @max_row, c = @max_col)
       alignment_1 = []
       alignment_2 = []
 
-      traceback do |i, j, flags|
+      traceback(r,c) do |i, j, flags|
         seq1_val = seq2_val = @skip_obj
         case flags
         when :align
